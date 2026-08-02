@@ -1,3 +1,12 @@
 spring:
   application:
     name: dive-backend
+  datasource:
+    url: jdbc:mysql://localhost:3307/${MYSQL_DATABASE}
+    username: ${MYSQL_USER}
+    password: ${MYSQL_PASSWORD}
+
+jwt:
+  secret: ${JWT_SECRET_KEY}
+  access-token-expiration-ms: 3600000      # 1시간
+  refresh-token-expiration-ms: 1209600000  # 14일
