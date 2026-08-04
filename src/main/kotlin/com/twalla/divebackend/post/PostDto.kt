@@ -40,3 +40,9 @@ data class PostDetailResponse(
 data class UpdatePostRequest(
     val content: JsonNullable<String> = JsonNullable.undefined(),
 )
+
+data class DeletePostResponse(
+    val id: Long,
+    val deletedAt: Instant,
+    val restorableUntil: Instant,
+)

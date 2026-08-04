@@ -1,6 +1,7 @@
 package com.twalla.divebackend.post
 
 import com.twalla.divebackend.user.User
+import java.time.temporal.ChronoUnit
 
 fun CreatePostRequest.toPost(user: User): Post {
     return Post(
@@ -32,6 +33,14 @@ fun Post.toPostDetailResponse(): PostDetailResponse {
         updatedAt = requireNotNull(this.updatedAt),
         userId = requireNotNull(this.user.id),
         nickname = this.user.nickname,
+    )
+}
+
+fun Post.toDeletePostResponse(): DeletePostResponse {
+    return DeletePostResponse(
+        id = requireNotNull(this.id),
+        deletedAt = requireNotNull(this.deletedAt),
+        restorableUntil = requireNotNull(this.deletedAt).plus(30, ChronoUnit.DAYS),
     )
 }
 

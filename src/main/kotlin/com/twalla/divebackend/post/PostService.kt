@@ -75,4 +75,26 @@ class PostService(
         return post.toPostDetailResponse()
     }
 
+    @Transactional
+    fun deletePost(userId: Long, postId: Long): DeletePostResponse {
+
+        val post = postRepository.findByIdAndDeletedAtIsNull(postId)
+            ?: throw ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                "존재하지 않는 게시글입니다: $postId",
+            )
+
+        if (post.user.id != userId) {
+            throw ResponseStatusException(
+                HttpStatus.FORBIDDEN,
+                "해당 게시글에 대한 권한이 없습니다.",
+            )
+        }
+
+        post.delete()
+        postRepository.flush()
+
+        return post.toDeletePostResponse()
+    }
+
 }

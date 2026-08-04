@@ -43,4 +43,13 @@ class PostController(
         return ResponseEntity.status(HttpStatus.OK).body(response)
     }
 
+    @DeleteMapping("/{postId}")
+    fun deletePost(
+        @AuthUser userId: Long,
+        @PathVariable postId: Long,
+    ): ResponseEntity<DeletePostResponse> {
+        val response = postService.deletePost(userId, postId)
+        return ResponseEntity.status(HttpStatus.OK).body(response)
+    }
+
 }
