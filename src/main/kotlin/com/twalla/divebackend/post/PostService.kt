@@ -60,9 +60,6 @@ class PostService(
                 "존재하지 않는 게시글입니다: $postId",
             )
 
-        println(post.user.id)
-        println(userId)
-
         if (post.user.id != userId) {
             throw ResponseStatusException(
                 HttpStatus.FORBIDDEN,
@@ -72,6 +69,7 @@ class PostService(
 
         if (request.content.isPresent) {
             post.updateContent(request.content.get())
+            postRepository.flush()
         }
 
         return post.toPostDetailResponse()
