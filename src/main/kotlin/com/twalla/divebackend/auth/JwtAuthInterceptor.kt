@@ -1,5 +1,6 @@
 package com.twalla.divebackend.auth
 
+import com.twalla.divebackend.user.UserRepository
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.http.HttpStatus
@@ -10,6 +11,7 @@ import org.springframework.web.servlet.HandlerInterceptor
 @Component
 class JwtAuthInterceptor(
     private val jwtProvider: JwtProvider,
+    private val userRepository: UserRepository,
 ) : HandlerInterceptor {
     companion object {
         const val USER_ID_ATTRIBUTE = "userId"
@@ -33,7 +35,16 @@ class JwtAuthInterceptor(
             )
         }
 
-        request.setAttribute(USER_ID_ATTRIBUTE, jwtProvider.getUserId(token))
+        val userId = jwtProvider.getUserId(token)
+
+        if (!userRepository.existsById(userId)) {
+            throw ResponseStatusException(
+                HttpStatus.UNAUTHORIZED,
+                "존재하지 않는 유저입니다."
+            )
+        }
+
+        request.setAttribute(USER_ID_ATTRIBUTE, userId)
         return true
     }
 

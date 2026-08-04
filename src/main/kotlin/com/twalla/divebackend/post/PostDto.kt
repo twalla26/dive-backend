@@ -2,6 +2,7 @@ package com.twalla.divebackend.post
 
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size
+import org.openapitools.jackson.nullable.JsonNullable
 import java.time.Instant
 
 data class CreatePostRequest(
@@ -24,7 +25,7 @@ data class GetPostSummaryResponse(
     val nickname: String,
 )
 
-data class GetPostDetailResponse(
+data class PostDetailResponse(
     val id: Long,
     val content: String,
     val viewCount: Long,
@@ -34,4 +35,8 @@ data class GetPostDetailResponse(
     val updatedAt: Instant,
     val userId: Long,
     val nickname: String,
+)
+
+data class UpdatePostRequest(
+    val content: JsonNullable<String> = JsonNullable.undefined(),
 )

@@ -21,8 +21,8 @@ fun Post.toGetPostSummaryResponse(): GetPostSummaryResponse {
     )
 }
 
-fun Post.toGetPostDetailResponse(): GetPostDetailResponse {
-    return GetPostDetailResponse(
+fun Post.toPostDetailResponse(): PostDetailResponse {
+    return PostDetailResponse(
         id = requireNotNull(this.id),
         content = this.content,
         viewCount = this.viewCount,

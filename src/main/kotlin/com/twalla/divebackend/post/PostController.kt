@@ -28,8 +28,18 @@ class PostController(
     }
 
     @GetMapping("/{postId}")
-    fun getPost(@PathVariable postId: Long): ResponseEntity<GetPostDetailResponse> {
+    fun getPost(@PathVariable postId: Long): ResponseEntity<PostDetailResponse> {
         val response = postService.getPost(postId)
+        return ResponseEntity.status(HttpStatus.OK).body(response)
+    }
+
+    @PatchMapping("/{postId}")
+    fun updatePost(
+        @AuthUser userId: Long,
+        @PathVariable postId: Long,
+        @Valid @RequestBody request: UpdatePostRequest,
+    ): ResponseEntity<PostDetailResponse> {
+        val response = postService.updatePost(userId, postId, request)
         return ResponseEntity.status(HttpStatus.OK).body(response)
     }
 

@@ -45,6 +45,9 @@ dependencies {
 
     // dotenv
     implementation("me.paulschwarz:springboot4-dotenv:5.1.0")
+
+    // JsonNullable<T>
+    implementation("org.openapitools:jackson-databind-nullable:0.2.10")
 }
 
 kotlin {
