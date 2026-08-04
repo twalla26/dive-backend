@@ -1,8 +1,10 @@
 package com.twalla.divebackend.auth
 
 import com.twalla.divebackend.user.UserRepository
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.web.server.ResponseStatusException
 import java.time.Instant
 
 @Service
@@ -18,7 +20,10 @@ class AuthService(
     fun signUp(request: SignUpRequest): SignUpResponse {
 
         if (userRepository.existsByEmail(request.email)) {
-            throw RuntimeException("이미 가입된 이메일입니다: ${request.email}")
+            throw ResponseStatusException(
+                HttpStatus.CONFLICT,
+                "이미 가입된 이메일입니다: ${request.email}"
+            )
         }
 
         val hashedPassword = passwordEncoder.encode(request.password)
@@ -34,10 +39,16 @@ class AuthService(
     fun login(request: LoginRequest): LoginResponse {
 
         val user = userRepository.findByEmail(request.email)
-            ?: throw RuntimeException("이메일 또는 비밀번호가 일치하지 않습니다.")
+            ?: throw ResponseStatusException(
+                HttpStatus.UNAUTHORIZED,
+                "이메일 또는 비밀번호가 일치하지 않습니다."
+            )
 
         if (!passwordEncoder.matches(request.password, user.password)) {
-            throw RuntimeException("이메일 또는 비밀번호가 일치하지 않습니다.")
+            throw ResponseStatusException(
+                HttpStatus.UNAUTHORIZED,
+                "이메일 또는 비밀번호가 일치하지 않습니다."
+            )
         }
 
         val userId = requireNotNull(user.id)
@@ -66,15 +77,23 @@ class AuthService(
     fun refresh(request: RefreshRequest): RefreshResponse {
 
         if (!jwtProvider.validateToken(request.refreshToken)) {
-            throw RuntimeException("유효하지 않은 refresh token입니다.")
+            throw ResponseStatusException(
+                HttpStatus.UNAUTHORIZED,
+                "유효하지 않은 refresh token입니다."
+            )
         }
 
         val savedToken = refreshTokenRepository.findByRefreshToken(request.refreshToken)
-            ?: throw RuntimeException("유효하지 않은 refresh token입니다.")
-
+            ?: throw ResponseStatusException(
+                HttpStatus.UNAUTHORIZED,
+                "유효하지 않은 refresh token입니다."
+            )
 
         if (savedToken.isExpired()) {
-            throw RuntimeException("만료된 refresh token입니다. 다시 로그인해주세요.")
+            throw ResponseStatusException(
+                HttpStatus.UNAUTHORIZED,
+                "유효하지 않은 refresh token입니다."
+            )
         }
 
         val userId = requireNotNull(savedToken.user.id)

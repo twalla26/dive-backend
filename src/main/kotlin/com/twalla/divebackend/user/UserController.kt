@@ -1,7 +1,6 @@
 package com.twalla.divebackend.user
 
-import com.twalla.divebackend.auth.JwtAuthInterceptor
-import jakarta.servlet.http.HttpServletRequest
+import com.twalla.divebackend.auth.AuthUser
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -12,8 +11,7 @@ class UserController(
     private val userService: UserService,
 ) {
     @GetMapping("me")
-    fun me(request: HttpServletRequest): MeResponse {
-        val userId = request.getAttribute(JwtAuthInterceptor.USER_ID_ATTRIBUTE) as Long
+    fun me(@AuthUser userId: Long): MeResponse {
         return userService.me(userId)
     }
 }
