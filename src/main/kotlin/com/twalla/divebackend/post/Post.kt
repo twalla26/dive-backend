@@ -15,7 +15,7 @@ import java.time.Instant
 @EntityListeners(AuditingEntityListener::class)
 class Post(
     @Lob
-    @Column(name = "content", nullable = false)
+    @Column(name = "content", nullable = false, length = 5000)
     var content: String,
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -26,7 +26,7 @@ class Post(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
-    var id: Long? = null
+    var id: Long = 0L
         protected set
 
     @ColumnDefault("0")
@@ -46,12 +46,12 @@ class Post(
 
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
-    var createdAt: Instant? = null
+    var createdAt: Instant = Instant.now()
         protected set
 
     @LastModifiedDate
     @Column(name = "updated_at", nullable = false)
-    var updatedAt: Instant? = null
+    var updatedAt: Instant = Instant.now()
         protected set
 
     @Column(name = "deleted_at")

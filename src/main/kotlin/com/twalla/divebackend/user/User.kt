@@ -22,12 +22,12 @@ class User(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
-    var id: Long? = null
+    var id: Long = 0L
         protected set
 
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
-    var createdAt: Instant? = null
+    var createdAt: Instant = Instant.now()
         protected set
 
     @Column(name = "deleted_at")

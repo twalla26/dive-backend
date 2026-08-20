@@ -12,33 +12,33 @@ fun CreatePostRequest.toPost(user: User): Post {
 
 fun Post.toGetPostSummaryResponse(): GetPostSummaryResponse {
     return GetPostSummaryResponse(
-        id = requireNotNull(this.id),
+        id = this.id,
         content = this.content.take(100),
         commentCount = this.commentCount,
         likeCount = this.likeCount,
         createdAt = requireNotNull(this.createdAt),
-        userId = requireNotNull(this.user.id),
+        userId = this.user.id,
         nickname = this.user.nickname,
     )
 }
 
 fun Post.toPostDetailResponse(): PostDetailResponse {
     return PostDetailResponse(
-        id = requireNotNull(this.id),
+        id = this.id,
         content = this.content,
         viewCount = this.viewCount,
         commentCount = this.commentCount,
         likeCount = this.likeCount,
         createdAt = requireNotNull(this.createdAt),
         updatedAt = requireNotNull(this.updatedAt),
-        userId = requireNotNull(this.user.id),
+        userId = this.user.id,
         nickname = this.user.nickname,
     )
 }
 
 fun Post.toDeletePostResponse(): DeletePostResponse {
     return DeletePostResponse(
-        id = requireNotNull(this.id),
+        id = this.id,
         deletedAt = requireNotNull(this.deletedAt),
         restorableUntil = requireNotNull(this.deletedAt).plus(30, ChronoUnit.DAYS),
     )

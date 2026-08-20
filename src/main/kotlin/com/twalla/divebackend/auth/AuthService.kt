@@ -51,7 +51,7 @@ class AuthService(
             )
         }
 
-        val userId = requireNotNull(user.id)
+        val userId = user.id
 
         val newAccessToken = jwtProvider.generateAccessToken(userId)
         val newRefreshToken = jwtProvider.generateRefreshToken(userId)
@@ -96,7 +96,7 @@ class AuthService(
             )
         }
 
-        val userId = requireNotNull(savedToken.user.id)
+        val userId = savedToken.user.id
 
         val newAccessToken = jwtProvider.generateAccessToken(userId)
         val newRefreshToken = jwtProvider.generateRefreshToken(userId)
