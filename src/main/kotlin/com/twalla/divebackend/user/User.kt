@@ -18,11 +18,6 @@ class User(
     @Column(name = "nickname", nullable = false, length = 50)
     var nickname: String,
 ) {
-    companion object {
-        fun new(email: String, password: String, nickname: String): User {
-            return User(email, password, nickname)
-        }
-    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -22,11 +22,6 @@ class Post(
     @JoinColumn(name = "user_id", nullable = false)
     val user: User,
 ) {
-    companion object {
-        fun new(content: String, user: User): Post {
-            return Post(content, user)
-        }
-    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
