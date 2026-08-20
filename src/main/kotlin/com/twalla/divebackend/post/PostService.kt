@@ -1,7 +1,6 @@
 package com.twalla.divebackend.post
 
 import com.twalla.divebackend.user.UserRepository
-import org.springframework.data.domain.Sort
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
@@ -16,7 +15,7 @@ class PostService(
 
     @Transactional(readOnly = true)
     fun getPosts(): GetPostsResponse {
-        val posts = postRepository.findAllByDeletedAtIsNull(Sort.by(Sort.Direction.DESC, "createdAt"))
+        val posts = postRepository.findAllByDeletedAtIsNullOrderByCreatedAtDesc()
 
         val response = posts.map {
             it.toGetPostSummaryResponse()
@@ -26,27 +25,30 @@ class PostService(
     }
 
     @Transactional
-    fun createPost(userId: Long, request: CreatePostRequest) {
+    fun createPost(userId: Long, request: CreatePostRequest): PostDetailResponse {
         val user = userRepository.findByIdOrNull(userId)
             ?: throw ResponseStatusException(
-                HttpStatus.NOT_FOUND,
+                HttpStatus.UNAUTHORIZED,
                 "존재하지 않는 유저입니다: $userId"
             )
 
         val post = request.toPost(user)
 
-        postRepository.save(post)
+        val savedPost = postRepository.save(post)
+
+        return savedPost.toPostDetailResponse()
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     fun getPost(postId: Long): PostDetailResponse {
+
+        postRepository.increaseViewCountById(postId)
+
         val post = postRepository.findByIdAndDeletedAtIsNull(postId)
             ?: throw ResponseStatusException(
                 HttpStatus.NOT_FOUND,
                 "존재하지 않는 게시글입니다: $postId"
             )
-
-        post.increaseViewCount()
 
         return post.toPostDetailResponse()
     }

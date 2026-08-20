@@ -14,7 +14,6 @@ import java.time.Instant
 @DynamicUpdate
 @EntityListeners(AuditingEntityListener::class)
 class Post(
-    @Lob
     @Column(name = "content", nullable = false, length = 5000)
     var content: String,
 
@@ -58,39 +57,15 @@ class Post(
     var deletedAt: Instant? = null
         protected set
 
+    fun updateContent(newContent: String) {
+        content = newContent
+    }
+
     fun isDeleted(): Boolean = deletedAt != null
 
     fun delete() {
         if (deletedAt == null) {
             deletedAt = Instant.now()
-        }
-    }
-
-    fun updateContent(newContent: String) {
-        content = newContent
-    }
-
-    fun increaseViewCount() {
-        viewCount += 1
-    }
-
-    fun increaseCommentCount() {
-        commentCount += 1
-    }
-
-    fun decreaseCommentCount() {
-        if (commentCount > 0) {
-            commentCount -= 1
-        }
-    }
-
-    fun increaseLikeCount() {
-        likeCount += 1
-    }
-
-    fun decreaseLikeCount() {
-        if (likeCount > 0) {
-            likeCount -= 1
         }
     }
 

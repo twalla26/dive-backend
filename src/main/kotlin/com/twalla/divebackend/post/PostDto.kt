@@ -1,5 +1,6 @@
 package com.twalla.divebackend.post
 
+import com.twalla.divebackend.user.AuthorResponse
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size
 import org.openapitools.jackson.nullable.JsonNullable
@@ -21,8 +22,7 @@ data class GetPostSummaryResponse(
     val commentCount: Int,
     val likeCount: Int,
     val createdAt: Instant,
-    val userId: Long,
-    val nickname: String,
+    val author: AuthorResponse,
 )
 
 data class PostDetailResponse(
@@ -33,8 +33,7 @@ data class PostDetailResponse(
     val likeCount: Int,
     val createdAt: Instant,
     val updatedAt: Instant,
-    val userId: Long,
-    val nickname: String,
+    val author: AuthorResponse,
 )
 
 data class UpdatePostRequest(

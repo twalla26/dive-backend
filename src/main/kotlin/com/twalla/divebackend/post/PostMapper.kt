@@ -1,6 +1,7 @@
 package com.twalla.divebackend.post
 
 import com.twalla.divebackend.user.User
+import com.twalla.divebackend.user.toAuthorResponse
 import java.time.temporal.ChronoUnit
 
 fun CreatePostRequest.toPost(user: User): Post {
@@ -16,9 +17,8 @@ fun Post.toGetPostSummaryResponse(): GetPostSummaryResponse {
         content = this.content.take(100),
         commentCount = this.commentCount,
         likeCount = this.likeCount,
-        createdAt = requireNotNull(this.createdAt),
-        userId = this.user.id,
-        nickname = this.user.nickname,
+        createdAt = this.createdAt,
+        author = this.user.toAuthorResponse(),
     )
 }
 
@@ -29,10 +29,9 @@ fun Post.toPostDetailResponse(): PostDetailResponse {
         viewCount = this.viewCount,
         commentCount = this.commentCount,
         likeCount = this.likeCount,
-        createdAt = requireNotNull(this.createdAt),
-        updatedAt = requireNotNull(this.updatedAt),
-        userId = this.user.id,
-        nickname = this.user.nickname,
+        createdAt = this.createdAt,
+        updatedAt = this.updatedAt,
+        author = this.user.toAuthorResponse(),
     )
 }
 

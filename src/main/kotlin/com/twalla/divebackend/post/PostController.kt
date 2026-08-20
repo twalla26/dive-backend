@@ -22,9 +22,9 @@ class PostController(
     fun createPost(
         @AuthUser userId: Long,
         @Valid @RequestBody request: CreatePostRequest,
-    ): ResponseEntity<Void> {
-        postService.createPost(userId, request)
-        return ResponseEntity.status(HttpStatus.CREATED).build()
+    ): ResponseEntity<PostDetailResponse> {
+        val response = postService.createPost(userId, request)
+        return ResponseEntity.status(HttpStatus.CREATED).body(response)
     }
 
     @GetMapping("/{postId}")

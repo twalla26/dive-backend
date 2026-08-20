@@ -12,7 +12,6 @@ import java.time.Instant
 @Table(name = "comment", schema = "dive")
 @EntityListeners(AuditingEntityListener::class)
 class Comment(
-    @Lob
     @Column(name = "content", nullable = false, length = 2000)
     val content: String,
 
@@ -36,7 +35,7 @@ class Comment(
         protected set
 
     @CreatedDate
-    @Column(name = "created_at", nullable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     var createdAt: Instant = Instant.now()
         protected set
 

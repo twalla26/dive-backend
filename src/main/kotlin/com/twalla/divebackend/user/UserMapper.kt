@@ -6,3 +6,10 @@ fun User.toMeResponse(): MeResponse {
         email = this.email,
     )
 }
+
+fun User.toAuthorResponse(): AuthorResponse {
+    return AuthorResponse(
+        userId = this.id,
+        nickname = this.nickname,
+    )
+}
