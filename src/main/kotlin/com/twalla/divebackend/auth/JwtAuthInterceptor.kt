@@ -3,13 +3,12 @@ package com.twalla.divebackend.auth
 import com.twalla.divebackend.user.UserRepository
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
-import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
-import org.springframework.web.server.ResponseStatusException
 import org.springframework.web.servlet.HandlerInterceptor
 
 @Component
 class JwtAuthInterceptor(
+    private val chain: List<AuthValidator>,
     private val jwtProvider: JwtProvider,
     private val userRepository: UserRepository,
 ) : HandlerInterceptor {
@@ -22,29 +21,11 @@ class JwtAuthInterceptor(
         response: HttpServletResponse,
         handler: Any,
     ): Boolean {
-        val token = extractToken(request)
-            ?: throw ResponseStatusException(
-                HttpStatus.UNAUTHORIZED,
-                "Authorization 헤더가 없습니다."
-            )
 
-        if (!jwtProvider.validateToken(token)) {
-            throw ResponseStatusException(
-                HttpStatus.UNAUTHORIZED,
-                "유효하지 않거나 만료된 토큰입니다."
-            )
-        }
+        val context = AuthContext(request)
+        chain.forEach { it.validate(context) }
 
-        val userId = jwtProvider.getUserId(token)
-
-        if (!userRepository.existsById(userId)) {
-            throw ResponseStatusException(
-                HttpStatus.UNAUTHORIZED,
-                "존재하지 않는 유저입니다."
-            )
-        }
-
-        request.setAttribute(USER_ID_ATTRIBUTE, userId)
+        request.setAttribute(USER_ID_ATTRIBUTE, context.userId)
         return true
     }
 
