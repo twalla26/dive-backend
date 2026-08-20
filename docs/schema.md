@@ -48,7 +48,6 @@
 | `content`    | text      |        | 댓글 본문 내용               |
 | `like_count` | int       |        | 좋아요수 (역정규화)            |
 | `created_at` | timestamp |        | 댓글 작성 일시               |
-| `deleted_at` | timestamp |        | 댓글 삭제 일시 (Soft Delete) |
 | `post_id`    | bigint    | **FK** | 소속 게시글 식별자 (`POST.id`) |
 | `user_id`    | bigint    | **FK** | 작성자 식별자 (`USER.id`)    |
 
