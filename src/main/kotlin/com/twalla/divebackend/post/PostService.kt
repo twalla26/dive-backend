@@ -1,7 +1,7 @@
 package com.twalla.divebackend.post
 
+import com.twalla.divebackend.user.User
 import com.twalla.divebackend.user.UserRepository
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -18,20 +18,14 @@ class PostService(
         val posts = postRepository.findAllByDeletedAtIsNullOrderByCreatedAtDesc()
 
         val response = posts.map {
-            it.toGetPostSummaryResponse()
+            it.toPostSummaryResponse()
         }
 
         return GetPostsResponse(response)
     }
 
     @Transactional
-    fun createPost(userId: Long, request: CreatePostRequest): PostDetailResponse {
-        val user = userRepository.findByIdOrNull(userId)
-            ?: throw ResponseStatusException(
-                HttpStatus.UNAUTHORIZED,
-                "존재하지 않는 유저입니다: $userId"
-            )
-
+    fun createPost(user: User, request: CreatePostRequest): PostDetailResponse {
         val post = request.toPost(user)
 
         val savedPost = postRepository.save(post)
@@ -40,7 +34,7 @@ class PostService(
     }
 
     @Transactional
-    fun getPost(postId: Long): PostDetailResponse {
+    fun getPost(postId: Long): PostDetailResponse { // ~AndIncreaseViewCount 함수 두개를 목적에 맞게 구현!
 
         postRepository.increaseViewCountById(postId)
 
@@ -54,7 +48,7 @@ class PostService(
     }
 
     @Transactional
-    fun updatePost(userId: Long, postId: Long, request: UpdatePostRequest): PostDetailResponse {
+    fun updatePost(user: User, postId: Long, request: UpdatePostRequest): PostDetailResponse {
 
         val post = postRepository.findByIdAndDeletedAtIsNull(postId)
             ?: throw ResponseStatusException(
@@ -62,7 +56,7 @@ class PostService(
                 "존재하지 않는 게시글입니다: $postId",
             )
 
-        if (post.user.id != userId) {
+        if (post.user.id != user.id) {
             throw ResponseStatusException(
                 HttpStatus.FORBIDDEN,
                 "해당 게시글에 대한 권한이 없습니다.",
@@ -78,7 +72,7 @@ class PostService(
     }
 
     @Transactional
-    fun deletePost(userId: Long, postId: Long): DeletePostResponse {
+    fun deletePost(user: User, postId: Long): DeletePostResponse {
 
         val post = postRepository.findByIdAndDeletedAtIsNull(postId)
             ?: throw ResponseStatusException(
@@ -86,7 +80,9 @@ class PostService(
                 "존재하지 않는 게시글입니다: $postId",
             )
 
-        if (post.user.id != userId) {
+        println("${post.user} + user")
+
+        if (post.user.id != user.id) {
             throw ResponseStatusException(
                 HttpStatus.FORBIDDEN,
                 "해당 게시글에 대한 권한이 없습니다.",

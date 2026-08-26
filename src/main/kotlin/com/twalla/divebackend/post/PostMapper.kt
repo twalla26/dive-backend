@@ -11,8 +11,8 @@ fun CreatePostRequest.toPost(user: User): Post {
     )
 }
 
-fun Post.toGetPostSummaryResponse(): GetPostSummaryResponse {
-    return GetPostSummaryResponse(
+fun Post.toPostSummaryResponse(): PostSummaryResponse {
+    return PostSummaryResponse(
         id = this.id,
         content = this.content.take(100),
         commentCount = this.commentCount,

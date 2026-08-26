@@ -1,6 +1,7 @@
 package com.twalla.divebackend.post
 
 import com.twalla.divebackend.auth.AuthUser
+import com.twalla.divebackend.user.User
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -20,10 +21,10 @@ class PostController(
 
     @PostMapping()
     fun createPost(
-        @AuthUser userId: Long,
+        @AuthUser user: User,
         @Valid @RequestBody request: CreatePostRequest,
     ): ResponseEntity<PostDetailResponse> {
-        val response = postService.createPost(userId, request)
+        val response = postService.createPost(user, request)
         return ResponseEntity.status(HttpStatus.CREATED).body(response)
     }
 
@@ -35,20 +36,20 @@ class PostController(
 
     @PatchMapping("/{postId}")
     fun updatePost(
-        @AuthUser userId: Long,
+        @AuthUser user: User,
         @PathVariable postId: Long,
         @Valid @RequestBody request: UpdatePostRequest,
     ): ResponseEntity<PostDetailResponse> {
-        val response = postService.updatePost(userId, postId, request)
+        val response = postService.updatePost(user, postId, request)
         return ResponseEntity.status(HttpStatus.OK).body(response)
     }
 
     @DeleteMapping("/{postId}")
     fun deletePost(
-        @AuthUser userId: Long,
+        @AuthUser user: User,
         @PathVariable postId: Long,
     ): ResponseEntity<DeletePostResponse> {
-        val response = postService.deletePost(userId, postId)
+        val response = postService.deletePost(user, postId)
         return ResponseEntity.status(HttpStatus.OK).body(response)
     }
 

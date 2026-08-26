@@ -1,5 +1,6 @@
 package com.twalla.divebackend.auth
 
+import com.twalla.divebackend.user.User
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.core.MethodParameter
 import org.springframework.stereotype.Component
@@ -13,7 +14,7 @@ class AuthUserArgumentResolver : HandlerMethodArgumentResolver {
 
     override fun supportsParameter(parameter: MethodParameter): Boolean {
         return parameter.hasParameterAnnotation(AuthUser::class.java) &&
-                parameter.parameterType == Long::class.java
+                parameter.parameterType == User::class.java
     }
 
     override fun resolveArgument(
@@ -25,7 +26,7 @@ class AuthUserArgumentResolver : HandlerMethodArgumentResolver {
         val servletRequest = webRequest.getNativeRequest(HttpServletRequest::class.java)
             ?: throw RuntimeException("요청 정보를 가져올 수 없습니다.")
 
-        return servletRequest.getAttribute(JwtAuthInterceptor.USER_ID_ATTRIBUTE) as? Long
+        return servletRequest.getAttribute(JwtAuthInterceptor.USER_ATTRIBUTE) as? User
             ?: throw RuntimeException("인증되지 않은 요청입니다.")
     }
 

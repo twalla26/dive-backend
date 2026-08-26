@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Size
 import java.time.Instant
 
 
-data class GetCommentsResponse(
+data class CommentsResponse(
     val comments: List<CommentResponse>,
 )
 

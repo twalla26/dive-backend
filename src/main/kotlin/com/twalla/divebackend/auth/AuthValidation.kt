@@ -1,21 +1,23 @@
 package com.twalla.divebackend.auth
 
+import com.twalla.divebackend.user.User
 import com.twalla.divebackend.user.UserRepository
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.core.annotation.Order
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
 import org.springframework.web.server.ResponseStatusException
 
 class AuthContext(val request: HttpServletRequest) {
     var token: String? = null
-    var userId: Long? = null
+    var user: User? = null
 
     val requiredToken: String
         get() = token ?: error("토큰 추출 단계가 선행되어야 합니다.")
 
-    val requiredUserId: Long
-        get() = userId ?: error("토큰 파싱 단계가 선행되어야 합니다")
+    val requiredUser: User
+        get() = user ?: error("토큰 파싱 단계가 선행되어야 합니다")
 }
 
 fun interface AuthValidator {
@@ -46,7 +48,8 @@ class TokenPresenceValidator : AuthValidator {
 @Component
 @Order(2)
 class TokenSignatureValidator(
-    private val jwtProvider: JwtProvider
+    private val jwtProvider: JwtProvider,
+    private val userRepository: UserRepository
 ) : AuthValidator {
     override fun validate(context: AuthContext) {
         if (!jwtProvider.validateToken(context.requiredToken)) {
@@ -56,21 +59,15 @@ class TokenSignatureValidator(
             )
         }
 
-        context.userId = jwtProvider.getUserId(context.requiredToken)
-    }
-}
+        val userId = jwtProvider.getUserId(context.requiredToken)
 
-@Component
-@Order(3)
-class UserExistenceValidator(
-    private val userRepository: UserRepository,
-) : AuthValidator {
-    override fun validate(context: AuthContext) {
-        if (!userRepository.existsById(context.requiredUserId)) {
+        if (!userRepository.existsByIdAndDeletedAtIsNull(userId)) {
             throw ResponseStatusException(
                 HttpStatus.UNAUTHORIZED,
                 "존재하지 않는 유저입니다.",
             )
         }
+
+        context.user = userRepository.findByIdOrNull(userId)
     }
 }

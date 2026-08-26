@@ -1,6 +1,7 @@
 package com.twalla.divebackend.comment
 
 import com.twalla.divebackend.post.PostRepository
+import com.twalla.divebackend.user.User
 import com.twalla.divebackend.user.UserRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
@@ -16,7 +17,7 @@ class CommentService(
 ) {
 
     @Transactional(readOnly = true)
-    fun getComments(postId: Long): GetCommentsResponse {
+    fun getComments(postId: Long): CommentsResponse {
 
         postRepository.findByIdAndDeletedAtIsNull(postId)
             ?: throw ResponseStatusException(
@@ -30,22 +31,16 @@ class CommentService(
             it.toCommentResponse()
         }
 
-        return GetCommentsResponse(response)
+        return CommentsResponse(response)
     }
 
     @Transactional
-    fun createComment(userId: Long, postId: Long, request: CreateCommentRequest): CommentResponse {
+    fun createComment(user: User, postId: Long, request: CreateCommentRequest): CommentResponse {
 
         val post = postRepository.findByIdAndDeletedAtIsNull(postId)
             ?: throw ResponseStatusException(
                 HttpStatus.NOT_FOUND,
                 "존재하지 않는 게시글입니다: $postId",
-            )
-
-        val user = userRepository.findByIdOrNull(userId)
-            ?: throw ResponseStatusException(
-                HttpStatus.UNAUTHORIZED,
-                "존재하지 않는 유저입니다."
             )
 
         val comment = request.toComment(post, user)
@@ -56,7 +51,7 @@ class CommentService(
     }
 
     @Transactional
-    fun deleteComment(userId: Long, commentId: Long) {
+    fun deleteComment(user: User, commentId: Long) {
 
         val comment = commentRepository.findByIdOrNull(commentId)
             ?: throw ResponseStatusException(
@@ -64,7 +59,7 @@ class CommentService(
                 "존재하지 않는 댓글입니다: $commentId"
             )
 
-        if (comment.user.id != userId) {
+        if (comment.user.id != user.id) {
             throw ResponseStatusException(
                 HttpStatus.FORBIDDEN,
                 "해당 댓글에 대한 권한이 없습니다.",

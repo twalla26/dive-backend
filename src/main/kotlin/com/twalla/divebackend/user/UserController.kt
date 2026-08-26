@@ -11,7 +11,7 @@ class UserController(
     private val userService: UserService,
 ) {
     @GetMapping("me")
-    fun me(@AuthUser userId: Long): MeResponse {
-        return userService.me(userId)
+    fun me(@AuthUser user: User): MeResponse {
+        return userService.me(user)
     }
 }

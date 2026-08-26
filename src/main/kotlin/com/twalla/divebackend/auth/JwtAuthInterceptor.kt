@@ -1,6 +1,5 @@
 package com.twalla.divebackend.auth
 
-import com.twalla.divebackend.user.UserRepository
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.stereotype.Component
@@ -9,11 +8,9 @@ import org.springframework.web.servlet.HandlerInterceptor
 @Component
 class JwtAuthInterceptor(
     private val chain: List<AuthValidator>,
-    private val jwtProvider: JwtProvider,
-    private val userRepository: UserRepository,
 ) : HandlerInterceptor {
     companion object {
-        const val USER_ID_ATTRIBUTE = "userId"
+        const val USER_ATTRIBUTE = "user"
     }
 
     override fun preHandle(
@@ -25,7 +22,7 @@ class JwtAuthInterceptor(
         val context = AuthContext(request)
         chain.forEach { it.validate(context) }
 
-        request.setAttribute(USER_ID_ATTRIBUTE, context.userId)
+        request.setAttribute(USER_ATTRIBUTE, context.user)
         return true
     }
 

@@ -13,10 +13,10 @@ data class CreatePostRequest(
 )
 
 data class GetPostsResponse(
-    val posts: List<GetPostSummaryResponse>
+    val posts: List<PostSummaryResponse>
 )
 
-data class GetPostSummaryResponse(
+data class PostSummaryResponse(
     val id: Long,
     val content: String,
     val commentCount: Int,
