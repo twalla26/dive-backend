@@ -64,7 +64,6 @@ class PostService(
 
         if (request.content.isPresent) {
             post.updateContent(request.content.get())
-            postRepository.flush() // 이거는 사실 필요 없음! 영속성 컨텍스트에 남아있음!
         }
 
         return post.toPostDetailResponse()
@@ -87,7 +86,6 @@ class PostService(
         }
 
         post.delete()
-        postRepository.flush()
 
         return post.toDeletePostResponse()
     }
