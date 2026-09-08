@@ -8,6 +8,8 @@ interface PostRepository : JpaRepository<Post, Long> {
 
     fun findAllByDeletedAtIsNullOrderByCreatedAtDesc(): List<Post>
 
+    fun findAllByUserIdAndDeletedAtIsNullOrderByCreatedAtDesc(userId: Long): List<Post>
+
     fun findByIdAndDeletedAtIsNull(id: Long): Post?
 
     @Modifying

@@ -23,6 +23,17 @@ class PostService(
         return GetPostsResponse(response)
     }
 
+    @Transactional(readOnly = true)
+    fun getPostsByUser(user: User): GetPostsResponse {
+        val posts = postRepository.findAllByUserIdAndDeletedAtIsNullOrderByCreatedAtDesc(userId = user.id)
+
+        val response = posts.map {
+            it.toPostSummaryResponse()
+        }
+
+        return GetPostsResponse(response)
+    }
+
     @Transactional
     fun createPost(user: User, request: CreatePostRequest): PostDetailResponse {
         val post = request.toPost(user)
