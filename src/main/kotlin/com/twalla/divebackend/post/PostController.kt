@@ -53,4 +53,22 @@ class PostController(
         return ResponseEntity.status(HttpStatus.OK).body(response)
     }
 
+    @PostMapping("/{postId}/likes")
+    fun likePost(
+        @AuthUser user: User,
+        @PathVariable postId: Long,
+    ): ResponseEntity<PostLikeResponse> {
+        val response = postService.likePost(user, postId)
+        return ResponseEntity.status(HttpStatus.OK).body(response)
+    }
+
+    @DeleteMapping("/{postId}/likes")
+    fun unlikePost(
+        @AuthUser user: User,
+        @PathVariable postId: Long,
+    ): ResponseEntity<PostLikeResponse> {
+        val response = postService.unlikePost(user, postId)
+        return ResponseEntity.status(HttpStatus.OK).body(response)
+    }
+
 }

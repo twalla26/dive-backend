@@ -45,3 +45,7 @@ data class DeletePostResponse(
     val deletedAt: Instant,
     val restorableUntil: Instant,
 )
+
+data class PostLikeResponse(
+    val likeCount: Int,
+)

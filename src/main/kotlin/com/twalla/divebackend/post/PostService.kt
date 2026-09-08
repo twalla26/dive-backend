@@ -1,7 +1,6 @@
 package com.twalla.divebackend.post
 
 import com.twalla.divebackend.user.User
-import com.twalla.divebackend.user.UserRepository
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -10,7 +9,7 @@ import org.springframework.web.server.ResponseStatusException
 @Service
 class PostService(
     private val postRepository: PostRepository,
-    private val userRepository: UserRepository,
+    private val postLikeRepository: PostLikeRepository,
 ) {
 
     @Transactional(readOnly = true)
@@ -65,7 +64,7 @@ class PostService(
 
         if (request.content.isPresent) {
             post.updateContent(request.content.get())
-            postRepository.flush()
+            postRepository.flush() // 이거는 사실 필요 없음! 영속성 컨텍스트에 남아있음!
         }
 
         return post.toPostDetailResponse()
@@ -80,8 +79,6 @@ class PostService(
                 "존재하지 않는 게시글입니다: $postId",
             )
 
-        println("${post.user} + user")
-
         if (post.user.id != user.id) {
             throw ResponseStatusException(
                 HttpStatus.FORBIDDEN,
@@ -93,6 +90,63 @@ class PostService(
         postRepository.flush()
 
         return post.toDeletePostResponse()
+    }
+
+    @Transactional
+    fun likePost(user: User, postId: Long): PostLikeResponse {
+
+        val post = postRepository.findByIdAndDeletedAtIsNull(postId)
+            ?: throw ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                "존재하지 않는 게시글입니다: $postId",
+            )
+
+        if (post.user.id == user.id) {
+            throw ResponseStatusException(
+                HttpStatus.FORBIDDEN,
+                "자신의 글에는 좋아요를 누를 수 없습니다."
+            )
+        }
+
+        if (postLikeRepository.existsByPostIdAndUserId(postId, user.id)) {
+            return PostLikeResponse(likeCount = post.likeCount)
+        }
+
+        try {
+            postLikeRepository.save(PostLike(post, user))
+        } catch (e: Exception) {
+            return PostLikeResponse(likeCount = post.likeCount)
+        }
+
+        postRepository.increaseLikeCountById(postId) // 벌크 UPDATE
+
+        // 벌크 UPDATE는 영속성 컨텍스트에 반영되지 않으므로 직접 보정
+        return PostLikeResponse(likeCount = post.likeCount + 1)
+    }
+
+    @Transactional
+    fun unlikePost(user: User, postId: Long): PostLikeResponse {
+
+        val post = postRepository.findByIdAndDeletedAtIsNull(postId)
+            ?: throw ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                "존재하지 않는 게시글입니다: $postId",
+            )
+
+        if (!postLikeRepository.existsByPostIdAndUserId(postId, user.id)) {
+            return PostLikeResponse(likeCount = post.likeCount)
+        }
+
+        val deleted = postLikeRepository.deleteByPostIdAndUserId(post.id, user.id)
+
+        if (deleted == 0) {
+            return PostLikeResponse(likeCount = post.likeCount)
+        }
+
+        postRepository.decreaseLikeCountById(postId) // 벌크 UPDATE
+
+        // 벌크 UPDATE는 영속성 컨텍스트에 반영되지 않으므로 직접 보정
+        return PostLikeResponse(likeCount = post.likeCount - 1)
     }
 
 }

@@ -19,6 +19,14 @@ interface PostRepository : JpaRepository<Post, Long> {
     fun increaseCommentCountById(id: Long): Int
 
     @Modifying
-    @Query("update Post p set p.commentCount = p.commentCount - 1 where p.id = :id and p.deletedAt is null")
+    @Query("update Post p set p.commentCount = p.commentCount - 1 where p.id = :id and p.commentCount > 0 and p.deletedAt is null")
     fun decreaseCommentCountById(id: Long): Int
+
+    @Modifying
+    @Query("update Post p set p.likeCount = p.likeCount + 1 where p.id = :id and p.deletedAt is null")
+    fun increaseLikeCountById(id: Long): Int
+
+    @Modifying
+    @Query("update Post p set p.likeCount = p.likeCount - 1 where p.id = :id and p.likeCount > 0 and p.deletedAt is null")
+    fun decreaseLikeCountById(id: Long): Int
 }
