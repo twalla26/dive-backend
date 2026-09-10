@@ -1,14 +1,16 @@
 package com.twalla.divebackend.post
 
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
 
 interface PostRepository : JpaRepository<Post, Long> {
 
-    fun findAllByDeletedAtIsNullOrderByCreatedAtDesc(): List<Post>
+    fun findAllByDeletedAtIsNull(pageable: Pageable): Page<Post>
 
-    fun findAllByUserIdAndDeletedAtIsNullOrderByCreatedAtDesc(userId: Long): List<Post>
+    fun findAllByUserIdAndDeletedAtIsNull(userId: Long, pageable: Pageable): Page<Post>
 
     fun findByIdAndDeletedAtIsNull(id: Long): Post?
 

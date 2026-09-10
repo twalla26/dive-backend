@@ -12,8 +12,12 @@ data class CreatePostRequest(
     val content: String,
 )
 
-data class GetPostsResponse(
-    val posts: List<PostSummaryResponse>
+data class PostListResponse(
+    val posts: List<PostSummaryResponse>,
+    val page: Int,
+    val size: Int,
+    val totalCount: Long,
+    val totalPages: Int,
 )
 
 data class PostSummaryResponse(

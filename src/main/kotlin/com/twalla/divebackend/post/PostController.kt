@@ -14,8 +14,11 @@ class PostController(
 ) {
 
     @GetMapping()
-    fun getPosts(): ResponseEntity<GetPostsResponse> {
-        val response = postService.getPosts()
+    fun getPosts(
+        @RequestParam(defaultValue = "0") page: Int,
+        @RequestParam(defaultValue = "10") size: Int,
+    ): ResponseEntity<PostListResponse> {
+        val response = postService.getPosts(page, size)
         return ResponseEntity.status(HttpStatus.OK).body(response)
     }
 

@@ -1,6 +1,8 @@
 package com.twalla.divebackend.post
 
 import com.twalla.divebackend.user.User
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Sort
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -13,25 +15,39 @@ class PostService(
 ) {
 
     @Transactional(readOnly = true)
-    fun getPosts(): GetPostsResponse {
-        val posts = postRepository.findAllByDeletedAtIsNullOrderByCreatedAtDesc()
+    fun getPosts(page: Int, size: Int): PostListResponse {
 
-        val response = posts.map {
+        val pageable = PageRequest.of(
+            page,
+            size,
+            Sort.by(Sort.Direction.DESC, "createdAt")
+        )
+
+        val posts = postRepository.findAllByDeletedAtIsNull(pageable)
+
+        val postSummaries = posts.content.map {
             it.toPostSummaryResponse()
         }
 
-        return GetPostsResponse(response)
+        return posts.toPostListResponse(postSummaries)
     }
 
     @Transactional(readOnly = true)
-    fun getPostsByAuthor(user: User): GetPostsResponse {
-        val posts = postRepository.findAllByUserIdAndDeletedAtIsNullOrderByCreatedAtDesc(userId = user.id)
+    fun getPostsByAuthor(user: User, page: Int, size: Int): PostListResponse {
 
-        val response = posts.map {
+        val pageable = PageRequest.of(
+            page,
+            size,
+            Sort.by(Sort.Direction.DESC, "createdAt")
+        )
+
+        val posts = postRepository.findAllByUserIdAndDeletedAtIsNull(userId = user.id, pageable)
+
+        val postSummaries = posts.content.map {
             it.toPostSummaryResponse()
         }
 
-        return GetPostsResponse(response)
+        return posts.toPostListResponse(postSummaries)
     }
 
     @Transactional

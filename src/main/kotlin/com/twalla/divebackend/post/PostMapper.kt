@@ -2,7 +2,19 @@ package com.twalla.divebackend.post
 
 import com.twalla.divebackend.user.User
 import com.twalla.divebackend.user.toAuthorResponse
+import org.springframework.data.domain.Page
 import java.time.temporal.ChronoUnit
+
+
+fun Page<Post>.toPostListResponse(posts: List<PostSummaryResponse>): PostListResponse {
+    return PostListResponse(
+        posts = posts,
+        page = this.number,
+        size = this.size,
+        totalCount = this.totalElements,
+        totalPages = this.totalPages,
+    )
+}
 
 fun CreatePostRequest.toPost(user: User): Post {
     return Post(

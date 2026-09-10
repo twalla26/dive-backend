@@ -1,10 +1,11 @@
 package com.twalla.divebackend.user
 
 import com.twalla.divebackend.auth.AuthUser
-import com.twalla.divebackend.post.GetPostsResponse
+import com.twalla.divebackend.post.PostListResponse
 import com.twalla.divebackend.post.PostService
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
@@ -19,7 +20,11 @@ class UserController(
     }
 
     @GetMapping("/me/posts")
-    fun getMyPosts(@AuthUser user: User): GetPostsResponse {
-        return postService.getPostsByAuthor(user)
+    fun getMyPosts(
+        @AuthUser user: User,
+        @RequestParam(defaultValue = "0") page: Int,
+        @RequestParam(defaultValue = "10") size: Int,
+    ): PostListResponse {
+        return postService.getPostsByAuthor(user, page, size)
     }
 }
