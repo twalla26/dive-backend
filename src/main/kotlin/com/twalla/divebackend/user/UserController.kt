@@ -20,6 +20,6 @@ class UserController(
 
     @GetMapping("/me/posts")
     fun getMyPosts(@AuthUser user: User): GetPostsResponse {
-        return postService.getPostsByUser(user)
+        return postService.getPostsByAuthor(user)
     }
 }
