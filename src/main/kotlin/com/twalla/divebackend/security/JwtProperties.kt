@@ -1,4 +1,4 @@
-package com.twalla.divebackend.auth
+package com.twalla.divebackend.security
 
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.stereotype.Component

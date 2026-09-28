@@ -36,7 +36,6 @@ class User(
 
     fun delete() {
         if (deletedAt == null)
-            return
-        deletedAt = Instant.now()
+            deletedAt = Instant.now()
     }
 }

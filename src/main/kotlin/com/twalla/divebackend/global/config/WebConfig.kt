@@ -1,7 +1,7 @@
-package com.twalla.divebackend.config
+package com.twalla.divebackend.global.config
 
-import com.twalla.divebackend.auth.AuthUserArgumentResolver
-import com.twalla.divebackend.auth.JwtAuthInterceptor
+import com.twalla.divebackend.security.AuthUserArgumentResolver
+import com.twalla.divebackend.security.JwtAuthInterceptor
 import org.springframework.context.annotation.Configuration
 import org.springframework.web.method.support.HandlerMethodArgumentResolver
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry

@@ -1,4 +1,4 @@
-package com.twalla.divebackend.auth
+package com.twalla.divebackend.security
 
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.ExpiredJwtException

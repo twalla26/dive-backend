@@ -1,4 +1,4 @@
-package com.twalla.divebackend.auth
+package com.twalla.divebackend.security
 
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse

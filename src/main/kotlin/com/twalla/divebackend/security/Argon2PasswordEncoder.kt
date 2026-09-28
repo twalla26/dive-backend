@@ -1,4 +1,4 @@
-package com.twalla.divebackend.auth
+package com.twalla.divebackend.security
 
 import de.mkammerer.argon2.Argon2
 import de.mkammerer.argon2.Argon2Factory

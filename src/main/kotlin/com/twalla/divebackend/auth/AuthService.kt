@@ -1,10 +1,14 @@
 package com.twalla.divebackend.auth
 
+import com.twalla.divebackend.global.error.AuthErrorCode
+import com.twalla.divebackend.global.error.BusinessException
+import com.twalla.divebackend.security.Argon2PasswordEncoder
+import com.twalla.divebackend.security.JwtProperties
+import com.twalla.divebackend.security.JwtProvider
 import com.twalla.divebackend.user.UserRepository
-import org.springframework.http.HttpStatus
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import org.springframework.web.server.ResponseStatusException
 import java.time.Instant
 
 @Service
@@ -16,14 +20,13 @@ class AuthService(
     private val jwtProperties: JwtProperties,
 ) {
 
+    private val log = LoggerFactory.getLogger(AuthService::class.java)
+
     @Transactional
     fun signUp(request: SignUpRequest): SignUpResponse {
 
         if (userRepository.existsByEmail(request.email)) {
-            throw ResponseStatusException(
-                HttpStatus.CONFLICT,
-                "이미 가입된 이메일입니다: ${request.email}"
-            )
+            throw BusinessException(AuthErrorCode.DUPLICATE_EMAIL)
         }
 
         val hashedPassword = passwordEncoder.encode(request.password)
@@ -32,6 +35,7 @@ class AuthService(
 
         val savedUser = userRepository.save(user)
 
+        log.info("회원가입: userId={}", savedUser.id)
         return savedUser.toSignUpResponse()
     }
 
@@ -39,16 +43,14 @@ class AuthService(
     fun login(request: LoginRequest): LoginResponse {
 
         val user = userRepository.findByEmail(request.email)
-            ?: throw ResponseStatusException(
-                HttpStatus.UNAUTHORIZED,
-                "이메일 또는 비밀번호가 일치하지 않습니다."
-            )
+            ?: run {
+                log.warn("로그인 실패: 존재하지 않는 이메일")
+                throw BusinessException(AuthErrorCode.INVALID_CREDENTIALS)
+            }
 
         if (!passwordEncoder.matches(request.password, user.password)) {
-            throw ResponseStatusException(
-                HttpStatus.UNAUTHORIZED,
-                "이메일 또는 비밀번호가 일치하지 않습니다."
-            )
+            log.warn("로그인 실패: userId={}", user.id)
+            throw BusinessException(AuthErrorCode.INVALID_CREDENTIALS)
         }
 
         val userId = user.id
@@ -70,6 +72,7 @@ class AuthService(
             )
         }
 
+        log.info("로그인 성공: userId={}", userId)
         return LoginResponse(accessToken = newAccessToken, refreshToken = newRefreshToken)
     }
 
@@ -77,23 +80,14 @@ class AuthService(
     fun refresh(request: RefreshRequest): RefreshResponse {
 
         if (!jwtProvider.validateToken(request.refreshToken)) {
-            throw ResponseStatusException(
-                HttpStatus.UNAUTHORIZED,
-                "유효하지 않은 refresh token입니다."
-            )
+            throw BusinessException(AuthErrorCode.INVALID_TOKEN)
         }
 
         val savedToken = refreshTokenRepository.findByRefreshToken(request.refreshToken)
-            ?: throw ResponseStatusException(
-                HttpStatus.UNAUTHORIZED,
-                "유효하지 않은 refresh token입니다."
-            )
+            ?: throw BusinessException(AuthErrorCode.INVALID_TOKEN)
 
         if (savedToken.isExpired()) {
-            throw ResponseStatusException(
-                HttpStatus.UNAUTHORIZED,
-                "유효하지 않은 refresh token입니다."
-            )
+            throw BusinessException(AuthErrorCode.INVALID_TOKEN)
         }
 
         val userId = savedToken.user.id
@@ -115,6 +109,7 @@ class AuthService(
             )
         }
 
+        log.info("토큰 재발급: userId={}", userId)
         return RefreshResponse(accessToken = newAccessToken, refreshToken = newRefreshToken)
     }
 }

@@ -1,13 +1,12 @@
-package com.twalla.divebackend.auth
+package com.twalla.divebackend.security
 
+import com.twalla.divebackend.global.error.AuthErrorCode
+import com.twalla.divebackend.global.error.BusinessException
 import com.twalla.divebackend.user.User
 import com.twalla.divebackend.user.UserRepository
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.core.annotation.Order
-import org.springframework.data.repository.findByIdOrNull
-import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
-import org.springframework.web.server.ResponseStatusException
 
 class AuthContext(val request: HttpServletRequest) {
     var token: String? = null
@@ -29,16 +28,10 @@ fun interface AuthValidator {
 class TokenPresenceValidator : AuthValidator {
     override fun validate(context: AuthContext) {
         val header = context.request.getHeader("Authorization")
-            ?: throw ResponseStatusException(
-                HttpStatus.UNAUTHORIZED,
-                "Authorization 헤더가 없습니다.",
-            )
+            ?: throw BusinessException(AuthErrorCode.INVALID_TOKEN)
 
         if (!header.startsWith("Bearer ")) {
-            throw ResponseStatusException(
-                HttpStatus.UNAUTHORIZED,
-                "Bearer 토큰 형식이 아닙니다.",
-            )
+            throw BusinessException(AuthErrorCode.INVALID_TOKEN)
         }
 
         context.token = header.substring(7)
@@ -53,21 +46,12 @@ class TokenSignatureValidator(
 ) : AuthValidator {
     override fun validate(context: AuthContext) {
         if (!jwtProvider.validateToken(context.requiredToken)) {
-            throw ResponseStatusException(
-                HttpStatus.UNAUTHORIZED,
-                "유효하지 않거나 만료된 토큰입니다.",
-            )
+            throw BusinessException(AuthErrorCode.INVALID_TOKEN)
         }
 
         val userId = jwtProvider.getUserId(context.requiredToken)
 
-        if (!userRepository.existsByIdAndDeletedAtIsNull(userId)) {
-            throw ResponseStatusException(
-                HttpStatus.UNAUTHORIZED,
-                "존재하지 않는 유저입니다.",
-            )
-        }
-
-        context.user = userRepository.findByIdOrNull(userId)
+        context.user = userRepository.findByIdAndDeletedAtIsNull(userId)
+            ?: throw BusinessException(AuthErrorCode.UNAUTHENTICATED)
     }
 }

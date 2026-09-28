@@ -1,4 +1,4 @@
-package com.twalla.divebackend.auth
+package com.twalla.divebackend.security
 
 @Target(AnnotationTarget.VALUE_PARAMETER)
 @Retention(AnnotationRetention.RUNTIME)

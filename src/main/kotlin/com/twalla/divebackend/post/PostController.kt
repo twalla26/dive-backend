@@ -1,6 +1,6 @@
 package com.twalla.divebackend.post
 
-import com.twalla.divebackend.auth.AuthUser
+import com.twalla.divebackend.security.AuthUser
 import com.twalla.divebackend.user.User
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus

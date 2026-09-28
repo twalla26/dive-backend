@@ -1,8 +1,8 @@
 package com.twalla.divebackend.user
 
-import com.twalla.divebackend.auth.AuthUser
 import com.twalla.divebackend.post.PostListResponse
 import com.twalla.divebackend.post.PostService
+import com.twalla.divebackend.security.AuthUser
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
