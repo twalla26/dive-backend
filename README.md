@@ -14,7 +14,7 @@
 
 ## 🛠 Tech Stack
 
-* **Backend:** Java 25, Spring Boot, Spring Data JPA
+* **Backend:** Kotlin 2.3 (JDK 25), Spring Boot 4.1, Spring Data JPA
 * **Database:** MySQL
 * **Frontend:** React (Vite 기반, CSR)
 * **Tooling:** Postman, Actuator (모니터링)
@@ -26,3 +26,59 @@
 | **Phase 1 (필수)** | 회원/인증, 커뮤니티, 소통 | 회원가입/로그인, 게시글 CRUD, 페이지네이션, 댓글/좋아요 |
 | **Phase 2 (선택)** | 소셜, 탐색 | 팔로우/언팔로우, 팔로잉 피드, 검색 |
 | **Phase 3 (제외)** | 인게이지먼트, 추천 | FCM 알림, 인기글 로직 (오버스펙 방지 및 기본기 집중) |
+
+## 🚀 실행 방법
+
+### 1. 사전 준비
+
+* JDK 25
+* Docker / Docker Compose
+
+### 2. 환경 변수 설정
+
+프로젝트 루트에 `.env` 파일을 생성합니다.
+
+```dotenv
+MYSQL_ROOT_PASSWORD=root_password
+MYSQL_DATABASE=dive
+MYSQL_USER=dive
+MYSQL_PASSWORD=dive_password
+
+JWT_SECRET_KEY=HS256용_32바이트_이상의_시크릿_키
+```
+
+### 3. 데이터베이스 실행
+
+MySQL 8.4 컨테이너를 띄웁니다. (호스트 포트 `3307` → 컨테이너 `3306`)
+
+```bash
+docker compose up -d
+```
+
+> 스키마는 자동 생성되지 않습니다. [docs/schema.md](docs/schema.md)를 참고해 테이블을 미리 생성해주세요.
+
+### 4. 애플리케이션 실행
+
+```bash
+./gradlew bootRun
+```
+
+서버는 기본적으로 `http://localhost:8080` 에서 실행됩니다.
+
+### 5. 테스트 실행
+
+```bash
+./gradlew test
+```
+
+### 6. 빌드
+
+```bash
+./gradlew build
+java -jar build/libs/dive-backend-0.0.1-SNAPSHOT.jar
+```
+
+## 📖 API 명세
+
+전체 엔드포인트 목록은 [docs/api-spec/summary.md](docs/api-spec/summary.md)에서 확인할 수 있습니다.
+인증이 필요한 API는 `Authorization: Bearer {accessToken}` 헤더가 필요합니다.
