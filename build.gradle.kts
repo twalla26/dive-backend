@@ -48,6 +48,9 @@ dependencies {
 
     // JsonNullable<T>
     implementation("org.openapitools:jackson-databind-nullable:0.2.10")
+
+    // Mock (Kotlin 전용)
+    testImplementation("io.mockk:mockk:1.14.11")
 }
 
 kotlin {
